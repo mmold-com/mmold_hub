@@ -3,6 +3,13 @@ name: Build QNAP Docker image
 on:
   release:
     types: [published]
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/build-qnap-release.yml
+      - docker/production/Dockerfile
+      - deploy/qnap/compose.container-station.yaml
+      - deploy/qnap/bootstrap_site.py
   workflow_dispatch:
     inputs:
       tag:
@@ -20,7 +27,7 @@ permissions:
   packages: write
 
 concurrency:
-  group: qnap-image-${{ github.event.release.tag_name || inputs.tag }}
+  group: qnap-image-${{ github.event.release.tag_name || inputs.tag || 'v16.37.0-fix47' }}
   cancel-in-progress: false
 
 jobs:
@@ -32,7 +39,7 @@ jobs:
       - name: Check out release source
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source_ref || github.event.release.tag_name || inputs.tag }}
+          ref: ${{ inputs.source_ref || github.event.release.tag_name || inputs.tag || github.ref_name }}
 
       - name: Prepare pinned Print Designer source
         run: |
@@ -83,7 +90,7 @@ jobs:
       - name: Upload image and checksum to the existing Release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag || 'v16.37.0-fix47' }}
           ASSET: mmold-hub-erpnext-v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47-qnap-docker.tar.gz
         run: |
           gh release upload "$RELEASE_TAG" "$ASSET" "$ASSET.sha256" --clobber
