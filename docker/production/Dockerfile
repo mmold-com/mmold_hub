@@ -43,6 +43,9 @@ RUN printf '%s\n' \
 
 WORKDIR /home/frappe/frappe-bench
 
+# Keep the one-click QNAP first-site bootstrap inside the immutable image.
+COPY --chown=frappe:frappe deploy/qnap/bootstrap_site.py /opt/mmold_hub/bootstrap_site.py
+
 COPY --chown=frappe:frappe pyproject.toml MANIFEST.in README.md license.txt /home/frappe/frappe-bench/apps/mmold_hub/
 COPY --chown=frappe:frappe mmold_hub /home/frappe/frappe-bench/apps/mmold_hub/mmold_hub
 COPY --chown=frappe:frappe reference_apps/print_designer /home/frappe/frappe-bench/apps/print_designer
