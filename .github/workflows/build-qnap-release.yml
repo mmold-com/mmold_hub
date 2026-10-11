@@ -1,0 +1,75 @@
+name: Build QNAP Docker image
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub Release tag to rebuild (for example v16.37.0-fix47)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: qnap-image-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build linux/amd64 image archive
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+
+      - name: Prepare pinned Print Designer source
+        run: |
+          mkdir -p reference_apps
+          git clone --depth 1 --single-branch --branch v1.6.7 \\
+            https://github.com/frappe/print_designer.git \\
+            reference_apps/print_designer
+          test "$(git -C reference_apps/print_designer rev-parse HEAD)" = \\
+            "d0d9bb9961c588c19d4201f9419737b67973a90a"
+
+      - name: Check Docker Buildx
+        run: docker buildx version
+
+      - name: Build and package QNAP image
+        env:
+          IMAGE_TAG: mmold-hub/erpnext:v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47
+          ASSET: mmold-hub-erpnext-v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47-qnap-docker.tar.gz
+        run: |
+          docker buildx build \\
+            --platform linux/amd64 \\
+            --file docker/production/Dockerfile \\
+            --tag "$IMAGE_TAG" \\
+            --output "type=docker,dest=/tmp/mmold-hub-fix47.tar" \\
+            .
+
+          gzip -1 -c /tmp/mmold-hub-fix47.tar > "$ASSET"
+          gzip -t "$ASSET"
+          tar -xOzf "$ASSET" manifest.json | grep -F "$IMAGE_TAG" >/dev/null
+
+          size_bytes=$(stat -c '%s' "$ASSET")
+          if [ "$size_bytes" -ge 2000000000 ]; then
+            echo "Release asset exceeds the safe 2 GB limit: $size_bytes bytes" >&2
+            exit 1
+          fi
+
+          sha256sum "$ASSET" | tee "$ASSET.sha256"
+
+      - name: Upload image and checksum to the existing Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          ASSET: mmold-hub-erpnext-v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47-qnap-docker.tar.gz
+        run: |
+          gh release upload "$RELEASE_TAG" "$ASSET" "$ASSET.sha256" --clobber
+          gh release view "$RELEASE_TAG" --json assets \\
+            --jq '.assets[].name' | grep -Fx "$ASSET"
