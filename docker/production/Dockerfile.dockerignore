@@ -12,6 +12,9 @@
 !docker/
 !docker/production/
 !docker/production/python-dependencies.lock
+!deploy/
+!deploy/qnap/
+!deploy/qnap/bootstrap_site.py
 
 # Exclude repository metadata, generated files, secrets, and research-only apps.
 **/.git
