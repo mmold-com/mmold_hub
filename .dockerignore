@@ -1,0 +1,27 @@
+.git
+.DS_Store
+.env
+dist
+build
+*.egg-info
+__pycache__
+*.pyc
+upstream
+reference_apps
+services
+research
+docs
+scripts
+tests/isolated-site/.env
+
+# Phase 5 isolated-image inputs. Keep source checkouts but never send Git metadata.
+!reference_apps/
+reference_apps/*
+!reference_apps/print_designer/
+!reference_apps/print_designer/**
+reference_apps/print_designer/.git
+reference_apps/print_designer/.git/**
+!reference_apps/pdf_on_submit/
+!reference_apps/pdf_on_submit/**
+reference_apps/pdf_on_submit/.git
+reference_apps/pdf_on_submit/.git/**
