@@ -37,6 +37,9 @@ jobs:
           test "$(git -C reference_apps/print_designer rev-parse HEAD)" = \
             "d0d9bb9961c588c19d4201f9419737b67973a90a"
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Check Docker Buildx
         run: docker buildx version
 
