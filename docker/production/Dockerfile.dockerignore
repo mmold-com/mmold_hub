@@ -1,0 +1,24 @@
+# Default-deny build context. Only the pinned runtime inputs below are sent.
+**
+!pyproject.toml
+!MANIFEST.in
+!README.md
+!license.txt
+!mmold_hub/
+!mmold_hub/**
+!reference_apps/
+!reference_apps/print_designer/
+!reference_apps/print_designer/**
+!docker/
+!docker/production/
+!docker/production/python-dependencies.lock
+
+# Exclude repository metadata, generated files, secrets, and research-only apps.
+**/.git
+**/.git/**
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+**/.env
+reference_apps/pdf_on_submit
+reference_apps/pdf_on_submit/**

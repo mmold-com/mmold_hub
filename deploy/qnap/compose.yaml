@@ -1,0 +1,229 @@
+x-app-image: &app_image
+  image: mmold-hub/erpnext:v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47
+  platform: linux/amd64
+  restart: unless-stopped
+
+x-bench-volumes: &bench_volumes
+  - type: bind
+    source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/sites
+    target: /home/frappe/frappe-bench/sites
+    bind:
+      create_host_path: false
+  - type: bind
+    source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/logs
+    target: /home/frappe/frappe-bench/logs
+    bind:
+      create_host_path: false
+  - type: bind
+    source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/backups
+    target: /home/frappe/frappe-bench/backup
+    bind:
+      create_host_path: false
+
+services:
+  configurator:
+    <<: *app_image
+    restart: "no"
+    entrypoint: ["bash", "-c"]
+    command:
+      - >-
+        set -eu;
+        ls -1 apps > sites/apps.txt;
+        bench set-config -g db_host db;
+        bench set-config -gp db_port 3306;
+        bench set-config -g redis_cache "redis://redis-cache:6379";
+        bench set-config -g redis_queue "redis://redis-queue:6379";
+        bench set-config -g redis_socketio "redis://redis-queue:6379";
+        bench set-config -gp socketio_port 9000;
+        bench set-config -g chromium_binary_path /usr/bin/chromium-headless-shell
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    volumes: *bench_volumes
+    networks: [app, data]
+
+  db:
+    image: mariadb:11.8.9-noble@sha256:de4cf325ed1fc8a22460b4f285de7b9e06d89edbd593505e678ec480f86e501b
+    platform: linux/amd64
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+    volumes:
+      - type: bind
+        source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/mariadb
+        target: /var/lib/mysql
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/secrets
+        target: /run/secrets
+        read_only: true
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [data]
+
+  redis-cache:
+    image: redis:8.6.7-alpine@sha256:019e4fb3c6de024c8f70ab5219d4abded5f335de770876981c7b0a051c43df87
+    platform: linux/amd64
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [data]
+
+  redis-queue:
+    image: redis:8.6.7-alpine@sha256:019e4fb3c6de024c8f70ab5219d4abded5f335de770876981c7b0a051c43df87
+    platform: linux/amd64
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - type: bind
+        source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/redis-queue
+        target: /data
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [data]
+
+  backend:
+    <<: *app_image
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    environment:
+      GUNICORN_THREADS: 4
+      GUNICORN_WORKERS: 2
+      GUNICORN_TIMEOUT: 120
+    volumes: *bench_volumes
+    networks: [app, data]
+
+  websocket:
+    <<: *app_image
+    command: ["node", "/home/frappe/frappe-bench/apps/frappe/socketio.js"]
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+      redis-queue:
+        condition: service_healthy
+    volumes: *bench_volumes
+    networks: [app, data]
+
+  queue-short:
+    <<: *app_image
+    command: ["bench", "worker", "--queue", "short,default"]
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    volumes: *bench_volumes
+    networks: [app, data]
+
+  queue-long:
+    <<: *app_image
+    command: ["bench", "worker", "--queue", "long,default,short"]
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    volumes: *bench_volumes
+    networks: [app, data]
+
+  scheduler:
+    <<: *app_image
+    command: ["bench", "schedule"]
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    volumes: *bench_volumes
+    networks: [app, data]
+
+  frontend:
+    <<: *app_image
+    command: ["nginx-entrypoint.sh"]
+    depends_on:
+      backend:
+        condition: service_started
+      websocket:
+        condition: service_started
+    environment:
+      BACKEND: backend:8000
+      SOCKETIO: websocket:9000
+      FRAPPE_SITE_NAME_HEADER: ${SITE_NAME:?Set SITE_NAME in the untracked .env file}
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 50m
+    ports:
+      - "0.0.0.0:${HTTP_PORT:-8088}:8080"
+    volumes: *bench_volumes
+    networks: [app, edge]
+
+  site-bootstrap:
+    <<: *app_image
+    profiles: [bootstrap]
+    restart: "no"
+    entrypoint: ["/home/frappe/frappe-bench/env/bin/python", "/opt/mmold_hub/bootstrap_site.py"]
+    command: ["${SITE_NAME:?Set SITE_NAME in the untracked .env file}"]
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/sites
+        target: /home/frappe/frappe-bench/sites
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/logs
+        target: /home/frappe/frappe-bench/logs
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${QNAP_BASE_PATH:?Set QNAP_BASE_PATH in the untracked .env file}/secrets
+        target: /run/secrets
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./bootstrap_site.py
+        target: /opt/mmold_hub/bootstrap_site.py
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [app, data]
+
+networks:
+  app:
+    internal: true
+  data:
+    internal: true
+  edge:
+    driver: bridge

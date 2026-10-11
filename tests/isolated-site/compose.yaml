@@ -1,0 +1,229 @@
+name: mmold_hub_isolated
+
+x-test-image: &test_image
+  image: ${MMOLD_TEST_IMAGE:-mmold-hub/erpnext-test:0.4.2}
+  build:
+    context: ../..
+    dockerfile: tests/isolated-site/Dockerfile
+
+services:
+  db:
+    image: mariadb:11.8
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MMOLD_TEST_DB_ROOT_PASSWORD:?required}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - db-data:/var/lib/mysql
+    networks: [data]
+
+  redis-cache:
+    image: redis:8.6-alpine
+    command: ["redis-server", "--save", ""]
+    networks: [data]
+
+  redis-queue:
+    image: redis:8.6-alpine
+    volumes:
+      - redis-queue-data:/data
+    networks: [data]
+
+  chromium-volume-init:
+    <<: *test_image
+    user: root
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        set -euo pipefail
+        chown -R frappe:frappe /home/frappe/frappe-bench/chromium
+        chmod 755 /home/frappe/frappe-bench/chromium
+    volumes:
+      - chromium-data:/home/frappe/frappe-bench/chromium
+
+  site-installer:
+    <<: *test_image
+    depends_on:
+      chromium-volume-init:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        set -euo pipefail
+        cd /home/frappe/frappe-bench
+        ls -1 apps > sites/apps.txt
+        bench set-config -g db_host db
+        bench set-config -gp db_port 3306
+        bench set-config -g redis_cache redis://redis-cache:6379
+        bench set-config -g redis_queue redis://redis-queue:6379
+        bench set-config -g redis_socketio redis://redis-queue:6379
+        bench set-config -gp socketio_port 9000
+        if [ ! -f "sites/$${MMOLD_TEST_SITE}/site_config.json" ]; then
+          bench new-site "$${MMOLD_TEST_SITE}" \
+            --mariadb-root-username root \
+            --mariadb-root-password "$${MMOLD_TEST_DB_ROOT_PASSWORD}" \
+            --admin-password "$${MMOLD_TEST_ADMIN_PASSWORD}" \
+            --mariadb-user-host-login-scope='%'
+        fi
+        bench --site "$${MMOLD_TEST_SITE}" install-app erpnext
+        bench --site "$${MMOLD_TEST_SITE}" install-app mmold_hub
+        if ! bench --site "$${MMOLD_TEST_SITE}" list-apps | awk '{print $1}' | grep -Fxq print_designer; then
+          bench --site "$${MMOLD_TEST_SITE}" install-app print_designer
+        fi
+        bench --site "$${MMOLD_TEST_SITE}" execute 'frappe.get_attr("print_designer.install.setup_chromium")()'
+        bench --site "$${MMOLD_TEST_SITE}" migrate
+        bench --site "$${MMOLD_TEST_SITE}" list-apps
+        bench --site "$${MMOLD_TEST_SITE}" execute mmold_hub.compatibility.validate_runtime
+    environment:
+      MMOLD_TEST_SITE: ${MMOLD_TEST_SITE:-mmold-test.localhost}
+      MMOLD_TEST_DB_ROOT_PASSWORD: ${MMOLD_TEST_DB_ROOT_PASSWORD:?required}
+      MMOLD_TEST_ADMIN_PASSWORD: ${MMOLD_TEST_ADMIN_PASSWORD:?required}
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+      - chromium-data:/home/frappe/frappe-bench/chromium
+    networks: [app, data, downloads]
+
+  backend:
+    <<: *test_image
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+      site-installer:
+        condition: service_completed_successfully
+      asset-linker:
+        condition: service_completed_successfully
+    entrypoint: ["start.sh"]
+    environment:
+      GUNICORN_THREADS: 2
+      GUNICORN_WORKERS: 2
+      GUNICORN_TIMEOUT: 120
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+      - chromium-data:/home/frappe/frappe-bench/chromium
+    networks: [app, data]
+
+  queue-short:
+    <<: *test_image
+    depends_on:
+      site-installer:
+        condition: service_completed_successfully
+    entrypoint: ["bench", "worker", "--queue", "short"]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+      - chromium-data:/home/frappe/frappe-bench/chromium
+    networks: [app, data]
+
+  queue-long:
+    <<: *test_image
+    depends_on:
+      site-installer:
+        condition: service_completed_successfully
+    entrypoint: ["bench", "worker", "--queue", "long,default"]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+      - chromium-data:/home/frappe/frappe-bench/chromium
+    networks: [app, data]
+
+  scheduler:
+    <<: *test_image
+    depends_on:
+      site-installer:
+        condition: service_completed_successfully
+    entrypoint: ["bench", "schedule"]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+      - chromium-data:/home/frappe/frappe-bench/chromium
+    networks: [app, data]
+
+  websocket:
+    <<: *test_image
+    depends_on:
+      asset-linker:
+        condition: service_completed_successfully
+      redis-queue:
+        condition: service_started
+    entrypoint: ["node", "/home/frappe/frappe-bench/apps/frappe/socketio.js"]
+    command: []
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+    networks: [app, data]
+
+  frontend:
+    <<: *test_image
+    depends_on:
+      backend:
+        condition: service_started
+      websocket:
+        condition: service_started
+      asset-linker:
+        condition: service_completed_successfully
+    entrypoint: ["nginx-entrypoint.sh"]
+    command: []
+    environment:
+      BACKEND: backend:8000
+      SOCKETIO: websocket:9000
+      FRAPPE_SITE_NAME_HEADER: ${MMOLD_TEST_SITE:-mmold-test.localhost}
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 50m
+    ports:
+      - "127.0.0.1:${MMOLD_TEST_HTTP_PORT:-8080}:8080"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+    networks: [app, browser]
+
+  asset-linker:
+    <<: *test_image
+    depends_on:
+      site-installer:
+        condition: service_completed_successfully
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        set -euo pipefail
+        rm -rf /home/frappe/frappe-bench/sites/assets
+        ln -s /home/frappe/frappe-bench/assets /home/frappe/frappe-bench/sites/assets
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+    networks: [app]
+
+volumes:
+  db-data:
+  redis-queue-data:
+  sites:
+  logs:
+  chromium-data:
+
+networks:
+  app:
+    internal: true
+  data:
+    internal: true
+  browser:
+  downloads:
