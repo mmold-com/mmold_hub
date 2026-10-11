@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/build-qnap-release.yml
       - docker/production/Dockerfile
+      - docker/production/Dockerfile.dockerignore
       - deploy/qnap/compose.container-station.yaml
       - deploy/qnap/bootstrap_site.py
   workflow_dispatch:
