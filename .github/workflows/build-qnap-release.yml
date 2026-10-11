@@ -71,9 +71,8 @@ jobs:
           docker buildx build \
             --platform linux/amd64 \
             --file docker/production/Dockerfile \
-            --tag "$IMAGE_TAG" \
             --output "type=image,name=$REGISTRY_IMAGE,push=true" \
-            --output "type=docker,dest=/tmp/mmold-hub-fix47.tar" \
+            --output "type=docker,name=$IMAGE_TAG,dest=/tmp/mmold-hub-fix47.tar" \
             .
 
           gzip -1 -c /tmp/mmold-hub-fix47.tar > "$ASSET"
