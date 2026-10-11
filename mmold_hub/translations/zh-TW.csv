@@ -1,0 +1,296 @@
+Invalid file name,檔案名稱無效
+Domain,領域,Company
+Domain,網域,Email Account
+Domain Name,領域名稱,Domain
+Domain Name,Domain Name,Email Domain
+Domain Settings,領域設定
+Mobile No,行動電話
+Completed Quantity cannot be negative,完成數量不可為負數
+Completed quantity cannot be negative.,完成數量不可為負數。
+"Completed, Process Loss or Pending Qty is required for Job Card {0}, please start and complete the job card before submission",工作卡 {0} 必須填寫完成數量、製程損耗或待處理數量；請先開始並完成工作卡，再提交。
+Create GL Reposting Entries,建立總帳重新過帳分錄
+Disabled Item {0} cannot be used in BOMs.,已停用的品項 {0} 不可用於物料清單。
+From Reference Date cannot be greater than To Reference Date,起始參照日期不可晚於結束參照日期
+GL Reposting Entries,總帳重新過帳分錄
+GL reposting entries created: {0},已建立 {0} 筆總帳重新過帳分錄
+GL reposting is not allowed against the voucher type {0}.,憑證類型 {0} 不允許進行總帳重新過帳。
+Include Revaluation Journals,包含重估日記帳
+Invalid Shipping Account,無效的運費科目
+Invalid Valuation Method,計價方式無效
+No new GL reposting entries were created for the selected rows.,所選資料列未建立任何新的總帳重新過帳分錄。
+"Only the accounting ledgers (General Ledger and Payment Ledger) will be reposted, and only for the selected rows posted on or after the From Date. Selected rows posted before it are ignored. Stock Ledger Entries and item valuation rates are left untouched.","僅會針對所選資料列重新過帳會計分類帳（總帳與付款分類帳），且只處理過帳日期為起始日期當日或之後的資料列。更早過帳的資料列會略過；庫存分類帳分錄與品項計價率不會變更。"
+Please select rows to create GL Reposting Entries,請選取資料列以建立總帳重新過帳分錄
+Please select rows to create {0},請選取資料列以建立 {0}
+Please select the date to repost the accounting ledgers from,請選擇會計分類帳重新過帳的起始日期
+Reposting Entries,重新過帳分錄
+"Serial No Wise Valuation cannot be enabled for Item {0} because Serial Nos already exist for it. Valuation for those Serial Nos was not tracked, so enabling it now would value outward entries incorrectly.","品項 {0} 已有序號，因此無法啟用「依序號計價」。這些序號先前未追蹤計價，現在啟用可能會造成出庫分錄計價錯誤。"
+Serial Nos Exist,已有序號
+"Serialized items are valued at Moving Average once stock transactions exist and Serial No Wise Valuation is disabled.","若品項已有庫存異動且未啟用「依序號計價」，序號管理品項將採移動平均法計價。"
+Shipping Account {0} does not belong to Company {1},運費科目 {0} 不屬於公司 {1}
+Use Serial No Wise Valuation,依序號計價
+"Valuation Method for Item {0} must be Moving Average because Serial No Wise Valuation is disabled. Enable Serial No Wise Valuation to use FIFO or LIFO.","品項 {0} 未啟用「依序號計價」，計價方式必須為移動平均法。若要使用先進先出法或後進先出法，請啟用「依序號計價」。"
+"Value every outward movement at each Serial No's own incoming rate. If unchecked, the item is valued at Moving Average once stock transactions exist. Cannot be enabled once Serial Nos exist for this item.","每筆出庫異動依各序號自身的入庫成本計價。若未勾選，品項在產生庫存異動後將採移動平均法計價。已有序號後便無法啟用。"
+Item,品項
+Item Code,料號
+Item Name,品項名稱
+Item Name,品項名稱,Item
+Item 名稱,品項名稱
+Item 名稱,品項名稱,Item
+模板物料,範本品項
+Items & Pricing,品項與價格
+Customer Group,客戶群組
+Customer Name in Arabic,客戶名稱（阿拉伯文）
+Is customer exempted from sales tax?,此客戶是否免徵營業稅？
+Is customer exempted from sales tax?,此客戶是否免徵營業稅？,Quotation
+Create Item,建立品項
+Customer Addresses And Contacts,客戶地址與聯絡資訊
+Supplier Group,供應商群組
+Supplier Addresses And Contacts,供應商地址與聯絡資訊
+Address And Contacts,地址與聯絡資訊
+Item Wise Consumption,品項耗用量
+Item Alternative,替代品項
+Item Attribute,品項屬性
+Item Manufacturer,品項製造商
+Item Price Stock,品項價格與庫存
+Itemwise Recommended Reorder Level,品項建議補貨點
+Requested Items to Order and Receive,已申請待下單與收貨品項
+Items To Be Requested,待建立物料需求的品項
+Item-wise Purchase History,品項採購明細
+Items to Order and Receive,待下單與收貨品項
+Items Catalogue,品項主檔
+Stock Value by Item Group,依品項群組分類的庫存金額
+Item Prices,品項價格
+Item Shortage Report,品項短缺報表
+Item Variant Details,品項規格明細
+Item Variant Settings,品項規格設定
+Product Bundle,產品組合
+Template Item,範本品項
+Template Item Selected,已選取範本品項
+Promotional Scheme,促銷方案
+Requested Items To Be Transferred,已申請待調撥品項
+Serial No and Batch,序號與批號
+Serial No Ledger,序號臺帳
+Serial No Service Contract Expiry,序號服務合約到期狀態
+Serial No Status,序號狀態
+Serial No Warranty Expiry,序號保固到期狀態
+Batch Item Expiry Status,品項批號效期狀態
+Stock Transactions,庫存異動
+Stock Reports,庫存報表
+Serial No and Batch Traceability,序號與批號追溯
+Stock Balance,庫存餘額（收發存彙總表）
+Stock Ledger,庫存分類帳
+Stock Projected Qty,預計庫存數量
+Stock Reconciliation,庫存盤點調整
+Total Active Items,啟用品項總數
+Item Lead Time,品項前置時間
+Subcontracted Item To Be Received,待入庫的委外品項
+Material Requirements Planning Report,物料需求規劃報表
+Material Requirements Planning,物料需求規劃
+Production Planning Report,生產計畫報表
+Production Plan,生產計畫
+Master Production Schedule,主生產排程
+BOM Search,物料清單用途查詢
+Quality Inspection Summary,品質檢驗彙總表
+Workstation Type,工作站類型
+Routing,製程路線
+Operation,作業
+BOM Operations Time,物料清單製程工時
+"<span class=""h4""><b>Masters &amp; Reports</b></span>",<span class=""h4""><b>主檔與報表</b></span>
+Opportunity Summary by Sales Stage,依銷售階段統計商機
+Prospects Engaged But Not Converted,已接洽但尚未轉換的潛在客戶
+Sales Pipeline,銷售流程
+Sales Pipeline Analytics,銷售流程分析
+First Response Time for Opportunity,商機首次回覆時間
+New Lead (Last 1 Month),近 1 個月新增潛在客戶
+New Opportunity (Last 1 Month),近 1 個月新增商機
+Manufactured Items Value,已製造品項金額
+Won Opportunities,成交商機
+Won Opportunity (Last 1 Month),近 1 個月成交商機
+Switch to Frappe CRM,了解 CRM 方案
+"Sales without complexity, lock-in and per-user costs. Try it for free!","了解 MMold Hub 的 CRM 解決方案。"
+"This module is scheduled for deprecation and will be completely removed in version 17, please use <a href=""https://frappe.io/crm"">Frappe CRM</a> instead.","此模組預計於第 17 版停止支援並移除。請洽 <a href=""https://mmold.com"">MMold Hub</a>，了解 CRM 替代方案。"
+Item Group,品項群組
+Item Price,品項價格
+Items and Pricing,品項與價格
+Currency and Price List,幣別與價目表
+Key Reports,重要報表
+POS Profile,POS 設定檔
+Opening & Closing,開班與結帳
+POS Opening Entry,POS 開班憑證
+POS Closing Entry,POS 結帳憑證
+No.,No.,Title of the 'row number' column
+Terms and Conditions Template,條款與條件範本
+Terms Template,條款範本
+"<span class=""h4""><b>Reports &amp; Masters</b></span>",<span class=""h4""><b>報表與主檔</b></span>
+Available Stock for Packing Items,包裝品項可用庫存
+Item-wise Sales History,品項銷售明細
+Item-wise Sales Register,品項銷售臺帳
+Pending SO Items For Purchase Request,待採購申請的銷售訂單品項
+Sales Partner Target Variance Based On Item Group,業務夥伴品項群組目標差異分析
+Sales Partner Target Variance based on Item Group,業務夥伴品項群組目標差異分析
+Sales Person Target Variance Based On Item Group,業務員品項群組目標差異分析
+Territory Target Variance Based On Item Group,區域品項群組目標差異分析
+Customer,客戶
+Supplier,供應商
+Warehouse,倉庫
+Stock,庫存
+Purchase,採購
+Sales,銷售
+Quotation,報價單
+Sales Order,銷售訂單
+Purchase Order,採購訂單
+Work Order,製令
+Job Card,工作卡
+Workstation,工作站
+Batch No,批號
+Serial No,序號
+Project,專案
+Projects,專案
+ERPNext Settings,設定
+Frappe Support,MMold Hub支援
+MMold Hub Support,MMold Hub支援
+Reset Desktop Layout,重設桌面版面
+Frappe Framework Version,MMold Framework 版本
+Visit Frappe Support Portal,前往 MMold Hub 支援網站
+Attachment,附件
+Field,欄位
+Save,儲存
+Delete,刪除
+Search,搜尋
+Filter,篩選
+Print,列印
+Import,匯入
+Export,匯出
+Settings,設定
+User,使用者
+Permission,權限
+Accounting Masters,會計主檔
+Cheque Print Template,支票列印範本
+Data Import and Settings,資料匯入與設定
+Has Print Format,具有列印格式
+Masters,主檔
+No Records for these settings.,沒有符合這些設定的資料。
+Not allow to set alternative item for the item {0},不允許為品項 {0} 設定替代品項
+Numero has not set in the XML file,XML 檔案中尚未設定編號
+POS Invoice isn't created by user {},POS 發票不是由使用者 {} 建立
+POS Profile doesn't match {},POS 設定檔與 {} 不相符
+POS Profile required to make POS Entry,建立 POS 單據需要 POS 設定檔
+POS Profile {} contains Mode of Payment {}. Please remove them to disable this mode.,POS 設定檔 {} 包含付款方式 {}；若要停用此方式，請先將其移除。
+POS Profile {} does not belong to company {},POS 設定檔 {} 不屬於公司 {}
+POS Profile {} does not exist.,POS 設定檔 {} 不存在。
+POS Profile {} is disabled.,POS 設定檔 {} 已停用。
+Please Select a Company,請選擇公司
+Please Select a Company.,請選擇公司。
+Please contact any of the following users to {} this transaction.,請聯絡下列任一使用者以對此交易執行 {}。
+Please import accounts against parent company or enable {} in company master.,請依母公司匯入會計科目，或在公司主檔啟用 {}。
+Please select BOM in BOM field for Item {item_code}.,請在品項 {item_code} 的 BOM 欄位選擇物料清單。
+Please select Company and Posting Date to getting entries,請選擇公司與過帳日期以取得分錄
+Please select atleast one item to continue,請至少選擇一個品項再繼續
+Please select atleast one operation to create Job Card,請至少選擇一道作業以建立工作卡
+Please select valid document type.,請選擇有效的單據類型。
+Please set Accounting Dimension {} in {},請在 {} 設定會計維度 {}
+Please set Fiscal Code for the customer '%s',請為客戶 %s 設定稅務識別碼
+Please set Fiscal Code for the public administration '%s',請為公部門機關 %s 設定稅務識別碼
+Please set Fixed Asset Account in {} against {}.,請在 {} 主檔中為公司 {} 設定固定資產科目。
+Please set Tax ID for the customer '%s',請為客戶「%s」設定統一編號
+Please set an Address on the Company '%s',請為公司「%s」設定地址
+Print and Stationery,列印與文具
+Project Update,專案更新
+Project Update.,專案更新。
+Repost Accounting Ledger Settings,重新過帳會計分類帳設定
+Accounting Dimension,會計維度
+Accounting Dimensions,會計維度
+Accounting Dimensions ,會計維度 
+Accounting Dimension Detail,會計維度明細
+Accounting Dimension Filter,會計維度篩選器
+Accounting Dimensions Filter,會計維度篩選條件
+Accounting Dimension <b>{0}</b> is required for 'Balance Sheet' account {1}.,資產負債表科目 {1} 必須填寫會計維度 <b>{0}</b>。
+Accounting Dimension <b>{0}</b> is required for 'Profit and Loss' account {1}.,損益科目 {1} 必須填寫會計維度 <b>{0}</b>。
+Allow Or Restrict Dimension,允許或限制維度
+Allowed Dimension,可用維度
+Applicable Dimension,適用維度
+Apply restriction on dimension values,限制維度值
+Apply to All Inventory Documents,套用至所有庫存單據（新增維度欄位）
+Consider Accounting Dimensions,納入會計維度
+Creating Dimensions...,正在建立維度……
+Default Dimension,預設維度
+Delete Dimension,刪除維度
+Dimension Defaults,維度預設值
+Dimension Details,維度明細
+Dimension Filter,維度篩選器
+Dimension Name,維度名稱
+Inventory Dimension,庫存維度
+Inventory Dimension Negative Stock,庫存維度負庫存
+Show Dimension Wise Stock,依維度顯示庫存
+"Row {0}: Accounting Dimension {1} is mandatory for account {2}. Set it on this Taxes and Charges row, or on Item Row {3} ({4}).","第 {0} 列：科目 {2} 必須填寫會計維度 {1}。請在此稅金與費用列，或品項列 {3}（{4}）設定。"
+Row {0}: {1} account already applied for Accounting Dimension {2},第 {0} 列：科目 {1} 已套用於會計維度 {2}
+Account to record additional purchase expenses like freight or customs for this item,用來記錄此品項額外採購費用（例如運費或關稅）的科目
+"Cannot enable Item-wise Inventory Account, as there are existing Stock Ledger Entries for the company {0} with Warehouse-wise Inventory Account. Please cancel the stock transactions first and try again.","無法啟用品項別庫存科目，因公司 {0} 已有使用倉庫別庫存科目的庫存分類帳分錄。請先取消相關庫存異動，再重試。"
+Enable Item-wise Inventory Account,啟用品項別庫存科目
+Invoices and Payments have been Fetched and Allocated,已取得發票與付款資料並完成分配
+No Matching Bank Transactions Found,找不到符合條件的銀行交易
+Party is required create a payment entry.,建立收付款憑證時必須指定往來對象。
+Please add the account to root level Company - {},請將科目新增至根公司 {}。
+Review Accounts Settings,檢視會計設定
+Review Chart of Accounts,檢視會計科目表
+Row #{0}: Journal Entry {1} does not have account {2} or already matched against another voucher,第 {0} 列：日記帳憑證 {1} 不包含科目 {2}，或該科目已與其他憑證核銷。
+Row #{}: POS Invoice {} has been {},第 {} 列：POS 銷售發票 {} 已被標記為 {}。
+Row #{}: POS Invoice {} is not against customer {},第 {} 列：POS 銷售發票 {} 並非對應客戶 {}。
+Row #{}: POS Invoice {} is not submitted yet,第 {} 列：POS 銷售發票 {} 尚未送出。
+Row #{}: Serial No {} cannot be returned since it was not transacted in original invoice {},第 {} 列：序號 {} 未在原始發票 {} 中交易，因此無法退回。
+Row #{}: The original Invoice {} of return invoice {} is not consolidated.,第 {} 列：退貨發票 {} 所對應的原始發票 {} 尚未彙總。
+Row {0}: Item Tax template updated as per validity and rate applied,第 {0} 列：已依有效期間及適用稅率更新品項稅別範本。
+Tax Masters,稅務主檔
+The currency of invoice {} ({}) is different from the currency of this dunning ({}).,發票 {}（{}）的幣別與此催款單（{}）的幣別不同。
+The selected change account {} doesn't belongs to Company {}.,所選找零科目 {} 不屬於公司 {}。
+There was an error updating Bank Account {} while linking with Plaid.,連結 Plaid 時更新銀行帳戶 {} 發生錯誤。
+Reconciliation Takes Effect On,核銷生效日
+Only Include Allocated Payments,僅包含已分配（已核銷）的付款
+"To cancel this Sales Invoice you need to cancel the POS Closing Entry {}.","若要取消此銷售發票，需先取消 POS 結帳憑證 {}。"
+Total payments amount can't be greater than {},付款總額不可超過 {}。
+You can add the original invoice {} manually to proceed,您也可以手動新增原始發票 {} 後繼續。
+You had {} errors while creating opening invoices. Check {} for more details,建立期初發票時發生 {} 個錯誤，請查看 {} 了解詳情。
+payments app is not installed. Please install it from {} or {},尚未安裝付款應用程式。請從 {} 或 {} 安裝。
+{} {} is not affecting bank account {},{} {} 不會影響銀行帳戶 {}。
+Row {0}: Quantity not available for {4} in warehouse {1} at posting time of the entry ({2} {3}),第 {0} 列：單據過帳時間（{2} {3}）時，倉庫 {1} 的品項 {4} 可用數量不足。
+To cancel a {} you need to cancel the POS Closing Entry {}.,若要取消 {}，需先取消 POS 結帳憑證 {}。
+You can add the original invoice {} manually to proceed.,您也可以手動新增原始發票 {} 後繼續。
+You need to cancel POS Closing Entry {} to be able to cancel this document.,若要取消此單據，必須先取消 POS 結帳憑證 {}。
+Reqired Qty,需求數量
+"Reserved Qty ({0}) cannot be a fraction. To allow this, disable '{1}' in UOM {3}.",預留數量 {0} 不可含小數；若要允許小數，請在計量單位 {3} 中停用「{1}」。
+"Row #{0}: Selling rate for item {1} is lower than its {2}.
+					Selling {3} should be atleast {4}.<br><br>Alternatively,
+					you can disable '{5}' in {6} to bypass
+					this validation.","第 {0} 列：品項 {1} 的售價低於其 {2}。
+					銷售 {3} 至少應為 {4}。<br><br>或者，
+					您可以停用 {6} 中的「{5}」以略過
+					此項驗證。"
+Sales Invoice isn't created by user {},銷售發票不是由使用者 {} 建立
+The Access to Request for Quotation From Portal is Disabled. To Allow Access, Enable it in Portal Settings.,入口網站的詢價申請功能已停用；若要開放存取，請在入口網站設定中啟用。
+Update Print Format,更新列印格式
+Used to create an opening Stock Entry with the Valuation Rate when the item is saved,儲存品項時，使用計價率建立期初庫存異動單。
+User {} is disabled. Please select valid user/cashier,使用者 {} 已停用，請選擇有效的使用者或收銀員
+You are not allowed to update as per the conditions set in {} Workflow.,依 {} 工作流程設定的條件，您沒有更新權限。
+You can also set default CWIP account in Company {},您也可以在公司 {} 主檔設定預設在建工程科目
+you must select Capital Work in Progress Account in accounts table,請在科目表中選擇在建工程科目
+"&copy; Frappe Technologies Pvt. Ltd. and contributors","© MMold Consulting Ltd. | © Frappe Technologies Pvt. Ltd. 與貢獻者"
+"Switch to Helpdesk",切換至客服服務台
+"Open Frappe Helpdesk",開啟客服服務台
+"Support without complexity, lock-in and per-user costs. Try it for free!",提供簡單透明、無綁約且不按使用者計費的客服方案，立即免費試用！
+"Support",售後服務
+"Support Settings",售後服務設定
+"Support Portal",客服入口
+"Support Team",客服團隊
+"Support Tickets",客服案件
+"Issue Type",案件類型
+"Issue Priority",案件優先級
+"Issues",客服案件
+"First Response Time for Issues",客服案件首次回覆時間
+"Maintenance Schedule",維護保養排程
+"Maintenance Visit",維護巡檢
+"Service Level Agreement",服務水準協議
+"Warranty",保固
+"Warranty Claim",保固申請
+"Warranty Expiry Date",保固到期日
+"Warranty Expiry (Serial)",序號保固到期日
+"This module is scheduled for deprecation and will be completely removed in version 17, please use <a href=""https://frappe.io/helpdesk"">Frappe Helpdesk</a> instead.","此模組預計於第 17 版停止支援並移除，請改用 <a href=""https://frappe.io/helpdesk"">MMold Hub 客服服務台</a>。"

@@ -1,0 +1,52 @@
+# Phase 1 reference checkouts are reproducible from research/source-lock.json.
+/upstream/
+/reference_apps/
+/services/
+
+# Secrets and local runtime state
+.env
+*.secret
+*.pem
+*.key
+/sites/
+/logs/
+/backups/
+/dist/
+/build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Local tooling
+.DS_Store
+
+# Internal deployment records are kept locally and must not be published.
+/deploy/qnap/
+/docs/20-phase-8-qnap-container-station.md
+/docs/15-acceptance-test.md
+/docs/17-phase-7-production-image.md
+/docs/16-risk-register.md
+/docs/18-phase-3-traditional-chinese.md
+/docs/19-phase-4-branding.md
+/docs/17-phase-2-custom-app-foundation.md
+/docs/07-printing-analysis.md
+/docs/12-backup-restore.md
+/docs/01-version-matrix.md
+/docs/09-qnap-deployment-analysis.md
+/docs/14-troubleshooting.md
+/docs/00-project-overview.md
+/research/phase2-isolated-site-validation.md
+/research/phase3-translation-validation.md
+/mmold_hub/tests/phase5_acceptance.py
+/mmold_hub/tests/phase5_print_samples.py
+/tests/isolated-site/
+/tests/test_qnap_bootstrap.py
+/docker/production/
+/docs/
+/research/
+/scripts/
+__pycache__/
+*.pyc
+
+# macOS metadata
+.DS_Store

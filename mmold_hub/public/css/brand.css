@@ -1,0 +1,45 @@
+.mmold-hub-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: inherit;
+	font-weight: 650;
+	letter-spacing: -0.02em;
+}
+
+.mmold-hub-brand-logo {
+	width: 2rem;
+	height: 2rem;
+	object-fit: contain;
+}
+
+.about-mmold-hub-wordmark {
+	max-width: 12rem;
+	max-height: 5rem;
+	object-fit: contain;
+}
+
+.sidebar-header .header-logo img,
+#brand-logo {
+	object-fit: contain;
+}
+
+.mmold-hub-zh-tw .ql-snow .ql-tooltip a.ql-action::after {
+	content: "編輯";
+}
+
+.mmold-hub-zh-tw .ql-snow .ql-tooltip a.ql-action.ql-editing::after {
+	content: "儲存";
+}
+
+.mmold-hub-zh-tw .ql-snow .ql-tooltip a.ql-remove::before {
+	content: "移除";
+}
+
+.mmold-hub-zh-tw .ql-snow .ql-tooltip::before {
+	content: "連結網址：";
+}
+
+.mmold-hub-zh-tw .form-grid .grid-heading-row .row-index {
+	white-space: nowrap;
+}

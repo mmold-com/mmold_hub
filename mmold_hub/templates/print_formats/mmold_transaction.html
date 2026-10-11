@@ -1,0 +1,170 @@
+{# Shared MMold Hub transaction layout. Child rows always flow in document order. #}
+{% set print_titles = {
+  "Quotation": "報價單",
+  "Sales Order": "銷售訂單",
+  "Delivery Note": "出貨單",
+  "Sales Invoice": "銷售發票",
+  "Purchase Order": "採購單",
+  "Purchase Receipt": "採購收貨單",
+  "Purchase Invoice": "進貨發票",
+  "Stock Entry": "庫存異動單",
+  "Work Order": "製令",
+  "Job Card": "工作卡"
+} %}
+{% set table_fields = {
+  "Quotation": "items", "Sales Order": "items", "Delivery Note": "items",
+  "Sales Invoice": "items", "Purchase Order": "items", "Purchase Receipt": "items",
+  "Purchase Invoice": "items", "Stock Entry": "items", "Work Order": "required_items",
+  "Job Card": "items"
+} %}
+{% set table_field = table_fields.get(doc.doctype, "items") %}
+{% set child_rows = doc.get(table_field) or [] %}
+{% set child_doctype = frappe.get_meta(doc.doctype).get_field(table_field).options %}
+{% set child_meta = frappe.get_meta(child_doctype) %}
+{% set column_count = 1 %}
+{% if child_meta.has_field("item_code") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("operation") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("description") or child_meta.has_field("item_name") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("qty") or child_meta.has_field("required_qty") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("uom") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("rate") or child_meta.has_field("basic_rate") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("amount") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("s_warehouse") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("t_warehouse") %}{% set column_count = column_count + 1 %}{% endif %}
+{% if child_meta.has_field("workstation") %}{% set column_count = column_count + 1 %}{% endif %}
+{% set company = frappe.get_cached_doc("Company", doc.company) if doc.company else None %}
+{% set logo = company.company_logo if company and company.company_logo else "/assets/mmold_hub/images/mmold-hub-logo.png" %}
+{% set currency = doc.currency if doc.currency else "TWD" %}
+{% set party_label = "客戶" if doc.get("customer") else ("供應商" if doc.get("supplier") else ("製成品" if doc.get("production_item") else ("異動類型" if doc.get("stock_entry_type") else "單據類型"))) %}
+{% set party_value = doc.get("customer_name") or doc.get("customer") or doc.get("supplier_name") or doc.get("supplier") or doc.get("production_item") or doc.get("stock_entry_type") or print_titles.get(doc.doctype, doc.doctype) %}
+{% set date_field = "transaction_date" if doc.meta.has_field("transaction_date") else ("posting_date" if doc.meta.has_field("posting_date") else ("planned_start_date" if doc.meta.has_field("planned_start_date") else None)) %}
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 13mm 12mm 16mm;
+      @bottom-center { content: "MMold Hub  |  https://mmold.com  |  第 " counter(page) " 頁"; color: #555; font: 8pt "Noto Sans CJK TC", sans-serif; }
+    }
+    * { box-sizing: border-box; }
+    body { color: #222; font-family: "Noto Sans CJK TC", sans-serif; font-size: 10pt; }
+    .print-format { min-height: 0 !important; max-width: none !important; padding: 0 !important; margin: 0 !important; border-radius: 0 !important; }
+    .masthead { width: 100%; border-bottom: 2px solid #145b48; margin-bottom: 6mm; }
+    .masthead td { border: 0; vertical-align: middle; padding: 0 0 3mm; }
+    .brand-logo { width: 19mm; height: 19mm; object-fit: contain; }
+    .company-name { font-size: 15pt; font-weight: 700; color: #145b48; }
+    .company-meta { font-size: 8.5pt; color: #555; }
+    .document-title { text-align: right; font-size: 17pt; font-weight: 700; }
+    .document-meta { width: 100%; border-collapse: collapse; margin: 0 0 5mm; }
+    .document-meta td { border: 0; padding: 1.5mm 2mm 1.5mm 0; vertical-align: top; }
+    .label { color: #555; font-size: 8.5pt; }
+    .value { font-weight: 600; }
+    .lines { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .lines thead { display: table-header-group; }
+    .lines tfoot { display: table-row-group; }
+    .lines tr { break-inside: avoid; page-break-inside: avoid; }
+    .lines th { background: #eaf2ef; border: 1px solid #a9beb6; padding: 2mm 1.5mm; text-align: left; }
+    .lines td { border: 1px solid #cbd5d1; padding: 1.8mm 1.5mm; vertical-align: top; overflow-wrap: anywhere; }
+    .lines .num { text-align: right; }
+    .lines th:first-child, .lines td:first-child { white-space: nowrap; text-align: center; }
+    .totals { width: 74mm; margin: 5mm 0 0 auto; border-collapse: collapse; page-break-inside: avoid; }
+    .totals td { padding: 1.5mm; border-bottom: 1px solid #ccd5d1; }
+    .totals .amount { text-align: right; white-space: nowrap; }
+    .totals .grand td { border-top: 2px solid #145b48; border-bottom: 0; font-size: 11pt; font-weight: 700; }
+    .terms { margin-top: 5mm; white-space: pre-line; page-break-inside: avoid; }
+    .status { font-weight: 700; color: #8b4b00; }
+  </style>
+</head>
+<body>
+    <table class="masthead"><tr>
+      <td style="width:22mm"><img class="brand-logo" src="{{ frappe.utils.get_url(logo) }}" alt="MMold Hub"></td>
+      <td><div class="company-name">{{ company.company_name if company else "MMold Hub" }}</div>
+        {% if company and company.get("tax_id") %}<div class="company-meta">統一編號：{{ company.tax_id }}</div>{% endif %}
+        {% if company and company.get("phone_no") %}<div class="company-meta">{{ company.phone_no }}</div>{% endif %}
+      </td>
+      <td><div class="document-title">{{ print_titles.get(doc.doctype, doc.doctype) }}</div>
+        <div class="company-meta" style="text-align:right">{{ doc.name }}</div></td>
+    </tr></table>
+    <table class="document-meta"><tbody>
+      <tr>
+        <td><div class="label">{{ party_label }}</div><div class="value">{{ party_value or "—" }}</div></td>
+        <td><div class="label">公司</div><div class="value">{{ doc.company or "—" }}</div></td>
+        <td><div class="label">日期／預計開始</div><div class="value">{{ doc.get_formatted(date_field) if date_field else "—" }}</div></td>
+      </tr>
+      <tr>
+        <td><div class="label">幣別</div><div class="value">{{ currency }}</div></td>
+        <td><div class="label">狀態</div><div class="value">{{ doc.status or "—" }}</div></td>
+        <td><div class="label">參考單號／製令</div><div class="value">{{ doc.get("work_order") or doc.get("po_no") or doc.get("against_sales_order") or doc.get("sales_order") or "—" }}</div></td>
+      </tr>
+      {% if doc.doctype == "Job Card" %}
+      <tr>
+        <td><div class="label">工序</div><div class="value">{{ doc.get("operation") or "—" }}</div></td>
+        <td><div class="label">工作站</div><div class="value">{{ doc.get("workstation") or "—" }}</div></td>
+        <td><div class="label">排程數量</div><div class="value">{{ doc.get_formatted("for_quantity", doc) if doc.meta.has_field("for_quantity") else "—" }} {{ doc.get("stock_uom") or "" }}</div></td>
+      </tr>
+      {% elif doc.doctype == "Work Order" %}
+      <tr>
+        <td><div class="label">BOM</div><div class="value">{{ doc.get("bom_no") or "—" }}</div></td>
+        <td><div class="label">預計數量</div><div class="value">{{ doc.get_formatted("qty", doc) if doc.meta.has_field("qty") else "—" }} {{ doc.get("stock_uom") or "" }}</div></td>
+        <td><div class="label">完工倉庫</div><div class="value">{{ doc.get("fg_warehouse") or "—" }}</div></td>
+      </tr>
+      {% endif %}
+    </tbody></table>
+  {% if doc.docstatus == 0 %}<div class="status">草稿</div>{% elif doc.docstatus == 2 %}<div class="status">已取消</div>{% endif %}
+  {% if doc.doctype == "Job Card" and not child_rows %}
+  <table class="lines job-card-summary" style="width:180mm !important; min-width:180mm !important; table-layout:fixed !important;"><thead><tr>
+    <th>製令</th><th>成品項目</th><th>工序</th><th>工作站</th><th class="num">排程數量</th>
+  </tr></thead><tbody><tr>
+    <td>{{ doc.get("work_order") or "—" }}</td>
+    <td>{{ doc.get("production_item") or "—" }}</td>
+    <td>{{ doc.get("operation") or "—" }}</td>
+    <td>{{ doc.get("workstation") or "—" }}</td>
+    <td class="num">{{ doc.get_formatted("for_quantity", doc) if doc.meta.has_field("for_quantity") else "—" }}</td>
+  </tr></tbody></table>
+  {% else %}
+  <table class="lines" style="width:180mm !important; min-width:180mm !important; table-layout:fixed !important;"><thead><tr>
+    <th style="width:12mm">序號</th>
+    {% if child_meta.has_field("item_code") %}<th style="width:24mm">料號</th>{% endif %}
+    {% if child_meta.has_field("operation") %}<th style="width:31mm">作業</th>{% endif %}
+    {% if child_meta.has_field("description") %}<th>品名／說明</th>{% elif child_meta.has_field("item_name") %}<th>品名</th>{% endif %}
+    {% if child_meta.has_field("qty") %}<th class="num" style="width:19mm">數量</th>{% elif child_meta.has_field("required_qty") %}<th class="num" style="width:19mm">需求量</th>{% endif %}
+    {% if child_meta.has_field("uom") %}<th style="width:16mm">單位</th>{% endif %}
+    {% if child_meta.has_field("rate") %}<th class="num" style="width:23mm">單價</th>{% elif child_meta.has_field("basic_rate") %}<th class="num" style="width:23mm">單價</th>{% endif %}
+    {% if child_meta.has_field("amount") %}<th class="num" style="width:25mm">金額</th>{% endif %}
+    {% if child_meta.has_field("s_warehouse") %}<th>來源倉庫</th>{% endif %}
+    {% if child_meta.has_field("t_warehouse") %}<th>目標倉庫</th>{% endif %}
+    {% if child_meta.has_field("workstation") %}<th>工作站</th>{% endif %}
+  </tr></thead><tbody>
+  {% for row in child_rows %}<tr>
+    <td>{{ row.idx or loop.index }}</td>
+    {% if child_meta.has_field("item_code") %}<td>{{ row.get("item_code") or "" }}</td>{% endif %}
+    {% if child_meta.has_field("operation") %}<td>{{ row.get("operation") or "" }}</td>{% endif %}
+    {% if child_meta.has_field("description") %}<td>{{ row.get("description") or "" }}</td>{% elif child_meta.has_field("item_name") %}<td>{{ row.get("item_name") or "" }}</td>{% endif %}
+    {% if child_meta.has_field("qty") %}<td class="num">{{ row.get_formatted("qty", doc) }}</td>{% elif child_meta.has_field("required_qty") %}<td class="num">{{ row.get_formatted("required_qty", doc) }}</td>{% endif %}
+    {% if child_meta.has_field("uom") %}<td>{{ row.get("uom") or "" }}</td>{% endif %}
+    {% if child_meta.has_field("rate") %}<td class="num">{{ row.get_formatted("rate", doc) }}</td>{% elif child_meta.has_field("basic_rate") %}<td class="num">{{ row.get_formatted("basic_rate", doc) }}</td>{% endif %}
+    {% if child_meta.has_field("amount") %}<td class="num">{{ row.get_formatted("amount", doc) }}</td>{% endif %}
+    {% if child_meta.has_field("s_warehouse") %}<td>{{ row.get("s_warehouse") or "" }}</td>{% endif %}
+    {% if child_meta.has_field("t_warehouse") %}<td>{{ row.get("t_warehouse") or "" }}</td>{% endif %}
+    {% if child_meta.has_field("workstation") %}<td>{{ row.get("workstation") or "" }}</td>{% endif %}
+  </tr>{% else %}<tr><td colspan="{{ column_count }}">無明細資料</td></tr>{% endfor %}
+  </tbody></table>
+  {% endif %}
+
+  {% set total_fields = [
+    ("total", "小計"), ("net_total", "未稅金額"), ("total_taxes_and_charges", "稅額"),
+    ("grand_total", "總計"), ("rounded_total", "四捨五入總計"), ("total_qty", "總數量")
+  ] %}
+  {% if doc.meta.has_field("total") or doc.meta.has_field("net_total") or doc.meta.has_field("grand_total") or doc.meta.has_field("total_qty") %}
+  <table class="totals"><tbody>
+    {% for fieldname, label in total_fields %}{% if doc.meta.has_field(fieldname) and doc.get(fieldname) is not none and not (fieldname == "net_total" and doc.meta.has_field("total")) and not (fieldname == "rounded_total" and doc.meta.has_field("grand_total") and doc.get("rounded_total") == doc.get("grand_total")) %}
+      <tr{% if fieldname in ["grand_total", "rounded_total"] %} class="grand"{% endif %}><td>{{ label }}</td><td class="amount">{{ doc.get_formatted(fieldname, doc) }}</td></tr>
+    {% endif %}{% endfor %}
+  </tbody></table>
+  {% endif %}
+
+  {% if doc.get("terms") %}<div class="terms"><strong>交易條件</strong><br>{{ doc.terms }}</div>{% endif %}
+</body>
+</html>

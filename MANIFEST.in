@@ -1,0 +1,3 @@
+include license.txt
+recursive-include mmold_hub *.css *.csv *.html *.ico *.js *.json *.md *.png *.po *.pot *.svg *.txt
+
