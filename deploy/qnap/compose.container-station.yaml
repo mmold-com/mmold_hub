@@ -2,7 +2,7 @@
 # Non-secret values are explicit because the GUI validator does not load .env.
 # Keep secrets as read-only files under /run/secrets; never add passwords here.
 x-app-image: &app_image
-  image: mmold-hub/erpnext:v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47
+  image: ghcr.io/mmold-com/mmold_hub:v16.37.0-fix47
   platform: linux/amd64
   restart: unless-stopped
 
@@ -178,7 +178,6 @@ services:
 
   site-bootstrap:
     <<: *app_image
-    profiles: [bootstrap]
     restart: "no"
     environment:
       FRAPPE_STREAM_LOGGING: "1"
@@ -207,12 +206,6 @@ services:
       - type: bind
         source: /share/CACHEDEV1_DATA/Container/mmold-hub/secrets
         target: /run/secrets
-        read_only: true
-        bind:
-          create_host_path: false
-      - type: bind
-        source: /share/CACHEDEV1_DATA/Container/mmold-hub/bootstrap_site.py
-        target: /opt/mmold_hub/bootstrap_site.py
         read_only: true
         bind:
           create_host_path: false
