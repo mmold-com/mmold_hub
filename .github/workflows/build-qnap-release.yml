@@ -31,10 +31,10 @@ jobs:
       - name: Prepare pinned Print Designer source
         run: |
           mkdir -p reference_apps
-          git clone --depth 1 --single-branch --branch v1.6.7 \\
-            https://github.com/frappe/print_designer.git \\
+          git clone --depth 1 --single-branch --branch v1.6.7 \
+            https://github.com/frappe/print_designer.git \
             reference_apps/print_designer
-          test "$(git -C reference_apps/print_designer rev-parse HEAD)" = \\
+          test "$(git -C reference_apps/print_designer rev-parse HEAD)" = \
             "d0d9bb9961c588c19d4201f9419737b67973a90a"
 
       - name: Check Docker Buildx
@@ -45,11 +45,11 @@ jobs:
           IMAGE_TAG: mmold-hub/erpnext:v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47
           ASSET: mmold-hub-erpnext-v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47-qnap-docker.tar.gz
         run: |
-          docker buildx build \\
-            --platform linux/amd64 \\
-            --file docker/production/Dockerfile \\
-            --tag "$IMAGE_TAG" \\
-            --output "type=docker,dest=/tmp/mmold-hub-fix47.tar" \\
+          docker buildx build \
+            --platform linux/amd64 \
+            --file docker/production/Dockerfile \
+            --tag "$IMAGE_TAG" \
+            --output "type=docker,dest=/tmp/mmold-hub-fix47.tar" \
             .
 
           gzip -1 -c /tmp/mmold-hub-fix47.tar > "$ASSET"
@@ -71,5 +71,5 @@ jobs:
           ASSET: mmold-hub-erpnext-v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47-qnap-docker.tar.gz
         run: |
           gh release upload "$RELEASE_TAG" "$ASSET" "$ASSET.sha256" --clobber
-          gh release view "$RELEASE_TAG" --json assets \\
+          gh release view "$RELEASE_TAG" --json assets \
             --jq '.assets[].name' | grep -Fx "$ASSET"
