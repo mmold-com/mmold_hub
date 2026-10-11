@@ -1,5 +1,5 @@
 x-app-image: &app_image
-  image: mmold-hub/erpnext:v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47
+  image: ghcr.io/mmold-com/mmold_hub:v16.37.0-fix47
   platform: linux/amd64
   restart: unless-stopped
 
