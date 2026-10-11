@@ -6,12 +6,18 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing GitHub Release tag to rebuild (for example v16.37.0-fix47)
+        description: Existing GitHub Release tag to update (for example v16.37.0-fix47)
         required: true
+        type: string
+      source_ref:
+        description: Source branch or commit to build (use main for the current installer)
+        required: true
+        default: main
         type: string
 
 permissions:
   contents: write
+  packages: write
 
 concurrency:
   group: qnap-image-${{ github.event.release.tag_name || inputs.tag }}
@@ -26,7 +32,7 @@ jobs:
       - name: Check out release source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: ${{ inputs.source_ref || github.event.release.tag_name || inputs.tag }}
 
       - name: Prepare pinned Print Designer source
         run: |
@@ -43,15 +49,22 @@ jobs:
       - name: Check Docker Buildx
         run: docker buildx version
 
+      - name: Log in to GitHub Container Registry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
       - name: Build and package QNAP image
         env:
           IMAGE_TAG: mmold-hub/erpnext:v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47
+          REGISTRY_IMAGE: ghcr.io/mmold-com/mmold_hub:v16.37.0-fix47
           ASSET: mmold-hub-erpnext-v16.37.0-mmold.6.37.0-pd1.6.7-amd64-zh-twfix47-qnap-docker.tar.gz
         run: |
           docker buildx build \
             --platform linux/amd64 \
             --file docker/production/Dockerfile \
             --tag "$IMAGE_TAG" \
+            --output "type=image,name=$REGISTRY_IMAGE,push=true" \
             --output "type=docker,dest=/tmp/mmold-hub-fix47.tar" \
             .
 
